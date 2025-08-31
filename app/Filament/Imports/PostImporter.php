@@ -37,7 +37,7 @@ class PostImporter extends Importer
 
     public function beforeSave(): void
     {
-        $categoryName = $this->data['category'];
+        $categoryName = $this->getColumnValue('category');
 
         if ($categoryName) {
             $category = Category::firstOrCreate(['name' => $categoryName]);

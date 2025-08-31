@@ -83,7 +83,6 @@ class InvoiceForm
                             ->columns(4)
                             ->defaultItems(1)
                             ->addActionLabel('Add Item')
-                            ->deleteActionLabel('Remove Item')
                             ->reorderableWithButtons()
                             ->collapsible(),
                     ]),

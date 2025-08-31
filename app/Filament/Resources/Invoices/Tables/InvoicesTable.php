@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\Invoices\Tables;
 
+use App\Filament\Exports\InvoiceExporter;
+use App\Filament\Imports\InvoiceImporter;
 use App\Models\Invoice;
 use App\Services\PdfService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Notifications\Notification;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use ZipArchive;
 
 class InvoicesTable
 {
@@ -22,19 +22,19 @@ class InvoicesTable
     {
         return $table
             ->columns([
-                TextColumn::make('invoice_number')
+                TextColumn::make('invoice_number')->label('Inv #')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('customer_name')
+                TextColumn::make('customer_name')->label('Customer')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('customer_email')
+                TextColumn::make('customer_email')->label('Email')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Items'),
-                TextColumn::make('total_amount')
+                    ->label('Item'),
+                TextColumn::make('total_amount')->label('Total')
                     ->money('USD')
                     ->sortable(),
                 TextColumn::make('status')
@@ -55,6 +55,7 @@ class InvoicesTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('Actions'),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -72,6 +73,10 @@ class InvoicesTable
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
                     ->action(fn(Invoice $record) => app(PdfService::class)->downloadInvoicePdf($record)),
+            ])
+            ->headerActions([
+                ExportAction::make()->exporter(InvoiceExporter::class),
+                ImportAction::make()->importer(InvoiceImporter::class),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
