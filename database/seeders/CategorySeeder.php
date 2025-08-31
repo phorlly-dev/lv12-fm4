@@ -2,19 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
+use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 
-class InvoiceSeeder extends Seeder
+class CategorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Invoice::factory(100)
-            ->has(InvoiceItem::factory(round(2, 8)), 'items')
+        Category::factory(100)
+            ->has(Post::factory(round(2, 8)), 'posts')
             ->create();
     }
 }

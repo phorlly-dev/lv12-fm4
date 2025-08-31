@@ -55,28 +55,6 @@ class PostsTable
                 // ]),
             ])
             ->toolbarActions([
-                Action::make('downloadPdf')
-                    ->action(function ($record) {
-                        try {
-                            $pdf = App::make(Pdf::class);
-                            $pdf->loadView('pdf.invoice', compact('record'));
-
-                            Notification::make()
-                                ->title('PDF Generated Successfully')
-                                ->success()
-                                ->send();
-
-                            return response()->streamDownload(
-                                fn() => print($pdf->output()),
-                                "invoice-{$record->id}.pdf"
-                            );
-                        } catch (\Exception $e) {
-                            Notification::make()
-                                ->title('PDF Generation Failed')
-                                ->danger()
-                                ->send();
-                        }
-                    }),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
