@@ -4,6 +4,10 @@ namespace App\Filament\Resources\Posts\Tables;
 
 use App\Filament\Exports\PostExporter;
 use App\Filament\Imports\PostImporter;
+use Barryvdh\DomPDF\PDF;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\App;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -12,7 +16,6 @@ use Filament\Actions\ImportAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Validation\Rules\File;
 
 class PostsTable
 {
@@ -46,12 +49,34 @@ class PostsTable
             ])
             ->headerActions([
                 ExportAction::make()->exporter(PostExporter::class),
-                ImportAction::make()->importer(PostImporter::class)
+                ImportAction::make()->importer(PostImporter::class),
                 // ->fileRules([
                 //     File::types(['csv', 'xlsx', 'xls', 'txt', 'json'])->max(5120),
                 // ]),
             ])
             ->toolbarActions([
+                Action::make('downloadPdf')
+                    ->action(function ($record) {
+                        try {
+                            $pdf = App::make(Pdf::class);
+                            $pdf->loadView('pdf.invoice', compact('record'));
+
+                            Notification::make()
+                                ->title('PDF Generated Successfully')
+                                ->success()
+                                ->send();
+
+                            return response()->streamDownload(
+                                fn() => print($pdf->output()),
+                                "invoice-{$record->id}.pdf"
+                            );
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('PDF Generation Failed')
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
