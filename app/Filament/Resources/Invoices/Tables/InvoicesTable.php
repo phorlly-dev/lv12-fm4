@@ -2,19 +2,20 @@
 
 namespace App\Filament\Resources\Invoices\Tables;
 
-use App\Filament\Exports\InvoiceExporter;
-use App\Filament\Imports\InvoiceImporter;
 use App\Models\Invoice;
+use Filament\Tables\Table;
 use App\Services\PdfService;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportAction;
 use Filament\Actions\ImportAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use App\Filament\Exports\InvoiceExporter;
+use App\Filament\Imports\InvoiceImporter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
 
 class InvoicesTable
 {
@@ -33,7 +34,8 @@ class InvoicesTable
                     ->searchable(),
                 TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Item'),
+                    ->label('Items')->badge()
+                    ->tooltip(fn($record) => $record->items->pluck('description')->join(', ')),
                 TextColumn::make('total_amount')->label('Total')
                     ->money('USD')
                     ->sortable(),
@@ -82,10 +84,10 @@ class InvoicesTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     // // Bulk PDF Download
-                    // BulkAction::make('downloadPdfs')
-                    //     ->label('Download PDFs')
-                    //     ->icon('heroicon-o-document-arrow-down')
-                    //     ->action(fn($records) => app(PdfService::class)->generateBulkInvoicePdfs($records)),
+                    BulkAction::make('downloadPdfs')
+                        ->label('Download PDFs')
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->action(fn($records) => app(PdfService::class)->generateBulkInvoicePdfs($records)),
                 ]),
             ]);
     }

@@ -13,8 +13,12 @@ class InvoiceSeeder extends Seeder
      */
     public function run(): void
     {
-        Invoice::factory(100)
-            ->has(InvoiceItem::factory(round(2, 8)), 'items')
-            ->create();
+        // First create some Invoices
+        $invoices = Invoice::factory(1000)->create();
+
+        // Then create posts assigned to random Invoices
+        InvoiceItem::factory(500)->create([
+            'invoice_id' => fn() => $invoices->random()->id,
+        ]);
     }
 }

@@ -13,7 +13,7 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-            'title'       => $this->faker->sentence(4),
+            'title'       => $this->faker->sentence(),
             'slug'        => $this->faker->unique()->slug(),
             'description' => $this->faker->paragraph(),
             'category_id' => Category::factory(), // auto create category if not provided

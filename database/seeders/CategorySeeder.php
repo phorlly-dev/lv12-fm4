@@ -13,8 +13,12 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::factory(100)
-            ->has(Post::factory(round(2, 8)), 'posts')
-            ->create();
+        // First create some categories
+        $categories = Category::factory(200)->create();
+
+        // Then create posts assigned to random categories
+        Post::factory(2000)->create([
+            'category_id' => fn() => $categories->random()->id,
+        ]);
     }
 }

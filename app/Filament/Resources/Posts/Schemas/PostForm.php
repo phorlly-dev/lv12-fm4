@@ -15,9 +15,7 @@ class PostForm
         return $schema
             ->components([
                 TextInput::make('title')->live(onBlur: true)
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        $set('slug', Str::slug($state));
-                    })
+                    ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state)))
                     ->required(),
                 TextInput::make('slug')
                     ->disabled() // makes the field read-only in the form
@@ -25,6 +23,7 @@ class PostForm
                     ->required()
                     ->unique(ignorable: fn($record) => $record),
                 Textarea::make('description')
+                    ->rows(3)
                     ->columnSpanFull(),
                 Select::make('category_id')
                     ->relationship('category', 'name')

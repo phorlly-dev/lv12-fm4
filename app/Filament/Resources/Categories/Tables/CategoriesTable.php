@@ -17,7 +17,18 @@ class CategoriesTable
                 TextColumn::make('name')
                     ->searchable()->sortable(),
                 TextColumn::make('slug')
-                    ->searchable()->sortable(),
+                    ->searchable()
+                    ->sortable()
+                    ->limit(20)
+                    ->tooltip(fn($record) => $record->slug)
+                    ->copyable()
+                    ->copyableState(fn($record) => $record->slug)
+                    ->copyMessage('Slug copied!')
+                    ->copyMessageDuration(1500),
+                TextColumn::make('posts_count')
+                    ->counts('posts')
+                    ->label('Posts')->badge()
+                    ->tooltip(fn($record) => $record->posts->pluck('title')->join(', ')),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
